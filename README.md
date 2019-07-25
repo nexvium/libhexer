@@ -1,4 +1,4 @@
-# libhex
+# libhexer
 
 A small, simple C/C++ library for reading and writing arbitrary binary data in 
 hexadecimal format.
@@ -7,7 +7,7 @@ hexadecimal format.
 
 This library is the result of me working on an existing code base that made
 extensive use of hexadecimal to exchange binary data between programs.  I was
-dismayed to see the source code littered with fragments like
+dismayed to see the source littered with fragments like
 
     for (i = 0; i < 4; i++) {
         printf("%02X", id[i]);
@@ -20,10 +20,10 @@ dismayed to see the source code littered with fragments like
     }
     print("\n");
 
-all over the place.  And sometimes with stupid bugs that were obviously due to
+throughout the code base, sometimes with stupid bugs that were obviously due to
 copying-and-pasting and failing to make some minor but required modification.
 
-Or even worse, something like
+Even worse, there as also code like
 
     printf("%08X:", *(uint32_t *)&id[0]);
     for (i = 0; i < 16; i++) {
@@ -34,8 +34,8 @@ Or even worse, something like
 resulting in ambiguous or erroneous endianess when trying to interpret the
 output.
 
-When it came time to work on another project without the legacy code, I decided
-to implement a more readable, maintainable, and less error-prone approach.
+I decided to implement a more readable, maintainable, and less error-prone
+approach.
 
 ## Usage
 
@@ -43,14 +43,17 @@ to implement a more readable, maintainable, and less error-prone approach.
     
     using libhexer;
     
-    // Output SHA-256 using defaults.
-    XPRINTN(digest, 32));
-    
-    // Create output object with defaults
-    // (no grouping, lower case letters).
-    HexOut xout;
-    
-    // Output SHA-256 digest.
-    std::cout << xout.String(digest, 32) << std::endl;
-    fprintf("%s\n", xout.String(digest, 32).c_str());
+    // Output fixed-sized integers using defaults.
+    printf("%s", XINT32(a));
+    printf("%s", XINT40(b));
 
+    // Output SHA-256 using defaults.
+    printf("%s", XDATN(digest, 32));
+
+    // Create output custom output object that uses upper-case letters,
+    // groups of four bytes, and a single space between groups.
+    HexOut xout({ .case = UPPER_CASE, .group = 4, .separator = " " });
+    
+    // Output fixed-sized integers using custom settings.
+    std::cout << xout.Int32(a) << std::endl;
+    printf("%s", xout.Int32(a).c_str())
