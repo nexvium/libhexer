@@ -43,7 +43,7 @@ public:
 
         Config(): letter_case(LOWER), group_size(0), group_separator("") {}
     };
-    static const Config CONFIG_DEFAULT ;
+    static const Config CONFIG_DEFAULT;
 
     /*
      * Create a HexOut object. If the cfg parameter is null, default options
@@ -105,7 +105,7 @@ public:
     /*
      * Get group separator, which may be the empty string.
      */
-    string GroupSeparato(void) const
+    string GroupSeparator(void) const
     {
         return _group_separator;
     }
@@ -113,10 +113,8 @@ public:
     /*
      * Output ints that are N-bits wide.
      */
-    string XInt8(uint8_t val) const
-    {
-        return _XIntN(2, val);
-    }
+    string XInt8(uint8_t val)   const { return _XIntN(2, val); }
+    string XInt16(uint16_t val) const { return _XIntN(4, val); }
 
 private:
     const char *    _xchars;
@@ -131,7 +129,6 @@ private:
     }
 
     const char * _GetHexChars(Case lcase) const;
-
     string _XIntN(int nibbles, uint64_t val) const;
 };
 

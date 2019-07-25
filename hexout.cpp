@@ -21,7 +21,6 @@ static const char XUPPER[] = { '0', '1', '2', '3', '4', '5', '6', '7',
                          '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'  };
 static const char XLOWER[] = { '0', '1', '2', '3', '4', '5', '6', '7',
                          '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'  };
-static const char *XCHAR = XLOWER;
 
 static const char XTABLE[256] = {
   /* 00-0F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -69,7 +68,7 @@ string HexOut::_XIntN(int nibbles, uint64_t val) const
     string hex(nibbles, '0');
 
     for (int i = nibbles - 1; val != 0; i--) {
-        hex[i] = XCHAR[val & 0xF];
+        hex[i] = _xchars[val & 0xF];
         val >>= 4;
     }
 
