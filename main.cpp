@@ -27,7 +27,7 @@ int main(int, char **)
 //    printf("%s\n", XINT32(0xbabeface));
 
     /* Change default object's settings to format MAC address. */
-    XOUT.GroupSize(1).GroupSeparator(":");
+    XOUT.SetGroupSize(1).SetGroupSeparator(":");
 //    printf("%s\n", XINT48(0xcafebabeface));
 
     return 0;

@@ -45,7 +45,7 @@ const HexOut::Config HexOut::CONFIG_DEFAULT;
 
 HexOut XOUT;
 
-const char * HexOut::_GetHexChars(Case lcase) const
+const char * HexOut::_GetHexChars(LetterCase lcase) const
 {
     const char * xchar = nullptr;
 
@@ -63,6 +63,7 @@ const char * HexOut::_GetHexChars(Case lcase) const
     return xchar;
 }
 
+/* I like this implementation but doesn't do groups.
 string HexOut::_XIntN(int nibbles, uint64_t val) const
 {
     string hex(nibbles, '0');
@@ -70,6 +71,26 @@ string HexOut::_XIntN(int nibbles, uint64_t val) const
     for (int i = nibbles - 1; val != 0; i--) {
         hex[i] = _xchars[val & 0xF];
         val >>= 4;
+    }
+
+    return hex;
+}
+*/
+
+inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
+{
+    size_t ngroups = nbytes / grpsz + (nbytes % grpsz ? 1 : 0);
+    return nbytes * 2 + seplen * (ngroups - 1);
+}
+
+string HexOut::_XIntN(size_t nbytes, uint64_t val) const
+{
+    string hex;
+    hex.reserve(_CalcStrLen(nbytes, _group_size, _group_separator.length()));
+
+    size_t x = 0;
+    if (_partial_group == FRONT) {
+        x = _group_size - (nbytes % _group_size);
     }
 
     return hex;

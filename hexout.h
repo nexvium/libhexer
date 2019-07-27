@@ -30,18 +30,26 @@ class HexOut
 {
 public:
     static const size_t MAX_GROUP_SIZE = 1024;
-    enum Case { LOWER = 0, UPPER = 1 };
+    enum LetterCase { LOWER = 0, UPPER = 1 };
+    enum PartialGroup { FRONT = 0, BACK = 1 };
 
     /*
      * Configure hex output options. By default, lower case is used and no
      * grouping is done.
      */
     struct Config {
-        Case    letter_case;
-        size_t  group_size;
-        string  group_separator;
+        LetterCase      letter_case;
+        PartialGroup    partial_group;
+        size_t          group_size;
+        string          group_separator;
 
-        Config(): letter_case(LOWER), group_size(0), group_separator("") {}
+        Config()
+          : letter_case(LOWER),
+            partial_group(FRONT),
+            group_size(0),
+            group_separator("")
+        {
+        }
     };
     static const Config CONFIG_DEFAULT;
 
@@ -51,85 +59,96 @@ public:
      */
     HexOut(const Config & cfg = CONFIG_DEFAULT)
       : _xchars(_GetHexChars(cfg.letter_case)),
+        _partial_group(_CheckPartialGroup(cfg.partial_group)),
         _group_size(_CheckGroupSize(cfg.group_size)),
         _group_separator(cfg.group_separator)
     {
     }
 
     /*
-     * Set letter case to use for hex values A-F. Throws exception on invalid
-     * setting. Returns object to allow chaining.
+     * Get the current configuration settings.
      */
-    HexOut & LetterCase(Case lcase)
+    Config GetConfig() const
+    {
+        Config cfg;
+
+        cfg.letter_case     = _xchars[0xa] == 'a' ? LOWER : UPPER;
+        cfg.partial_group   = _partial_group;
+        cfg.group_size      = _group_size;
+        cfg.group_separator = _group_separator;
+
+        return cfg;
+    }
+
+    /*
+     * Set letter case to use for hex values A-F. Throws exception on invalid
+     * setting. Returns self to allow chaining.
+     */
+    HexOut & SetLetterCase(LetterCase lcase)
     {
         _xchars = _GetHexChars(lcase);
         return *this;
     }
 
     /*
-     * Get the letter case being used for hex values A-F.
+     * Set partial group mode. Throws exception on invalid setting. Returns
+     * self to allow chaining.
      */
-    Case LetterCase(void) const
+    HexOut & SetPartialGroup(PartialGroup pg)
     {
-        return _xchars[0xa] == 'a' ? LOWER : UPPER;
+        _partial_group = _CheckPartialGroup(pg);
+        return *this;
     }
 
     /*
      * Set group size. Size of 0 means no grouping. Throws exception on invalid
-     * size. Returns object to allow chaining.
+     * size. Returns self to allow chaining.
      */
-    HexOut & GroupSize(size_t size)
+    HexOut & SetGroupSize(size_t size)
     {
         _group_size = _CheckGroupSize(size);
         return *this;
     }
 
     /*
-     * Get group size. Size of 0 means no grouping.
-     */
-    size_t GroupSize() const
-    {
-        return _group_size;
-    }
-
-    /*
-     * Set group separator, which may be any string. Returns object to allow
+     * Set group separator, which may be any string. Returns self to allow
      * chaining.
      */
-    HexOut & GroupSeparator(const string & sep)
+    HexOut & SetGroupSeparator(const string & sep)
     {
         _group_separator = sep;
         return *this;
     }
 
     /*
-     * Get group separator, which may be the empty string.
-     */
-    string GroupSeparator(void) const
-    {
-        return _group_separator;
-    }
-
-    /*
      * Output ints that are N-bits wide.
      */
-    string XInt8(uint8_t val)   const { return _XIntN(2, val); }
-    string XInt16(uint16_t val) const { return _XIntN(4, val); }
+    string XInt8(uint8_t val)   const { return _XIntN(1, val); }
+    string XInt16(uint16_t val) const { return _XIntN(2, val); }
 
 private:
     const char *    _xchars;
+    PartialGroup    _partial_group;
     size_t          _group_size;
     string          _group_separator;
 
-    inline size_t _CheckGroupSize(size_t sz) const
-    {
-        if (sz > MAX_GROUP_SIZE)
+    inline size_t _CheckGroupSize(size_t sz) const {
+        if (sz > MAX_GROUP_SIZE) {
             throw std::runtime_error("group size too big");
+        }
         return sz;
     }
 
-    const char * _GetHexChars(Case lcase) const;
-    string _XIntN(int nibbles, uint64_t val) const;
+    inline PartialGroup _CheckPartialGroup(PartialGroup pg) const
+    {
+        if (pg != FRONT && pg != BACK) {
+            throw std::runtime_error("invalid partial group setting");
+        }
+        return pg;
+    }
+
+    const char * _GetHexChars(LetterCase lcase) const;
+    string _XIntN(size_t nbytes, uint64_t val) const;
 };
 
 } //namespace
