@@ -16,7 +16,15 @@
 
 #include "libhexer/hexer.h"
 
+#include <assert.h>
+
 using namespace libhexer;
+
+#define CHECK(a,b,c) do { \
+    string s = b(a); \
+    printf("INPUT: %x  OUTPUT: %s  EXPECTED: %s\n", a, s.c_str(), c); \
+    assert(s == c); \
+    } while (0)
 
 int main(int, char **)
 {
@@ -27,8 +35,15 @@ int main(int, char **)
 //    printf("%s\n", XINT32(0xbabeface));
 
     /* Change default object's settings to format MAC address. */
-    XOUT.SetGroupSize(1).SetGroupSeparator(":");
+//    XOUT.SetGroupSize(1).SetGroupSeparator(":");
 //    printf("%s\n", XINT48(0xcafebabeface));
+
+    //printf("%s"XOUT.XInt16(0xaced) == "aced");
+    XOUT.SetGroupSize(1).SetGroupSeparator(":");
+    CHECK(0xaced, XOUT.XInt16, "ac:ed");
+
+    XOUT.SetGroupSize(2);
+    CHECK(0xdecade, XOUT.XInt24, "de:cade");
 
     return 0;
 }

@@ -125,6 +125,7 @@ public:
      */
     string XInt8(uint8_t val)   const { return _XIntN(1, val); }
     string XInt16(uint16_t val) const { return _XIntN(2, val); }
+    string XInt24(uint32_t val) const { return _XIntN(3, val); }
 
 private:
     const char *    _xchars;
