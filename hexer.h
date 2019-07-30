@@ -21,27 +21,25 @@
 #include "libhexer/hexout.h"
 #include "libhexer/hexin.h"
 
-extern libhexer::HexOut XOUT;
-
 /*
- * This macros are for convenience when using printf("%s").
+ * These macros are for convenience when using printf("%s")-style calls.
  */
-#define XINT8(a)  XOUT.Int8(a).c_str()
-#define XINT16(a) XOUT.Int16(a).c_str()
-#define XINT24(a) XOUT.Int24(a).c_str()
-#define XINT32(a) XOUT.Int32(a).c_str()
-#define XINT40(a) XOUT.Int40(a).c_str()
-#define XINT48(a) XOUT.Int48(a).c_str()
-#define XINT56(a) XOUT.Int56(a).c_str()
-#define XINT64(a) XOUT.Int64(a).c_str()
-#define XDATN(p,l) XOUT.Data(p,l).c_str()
+#define XINT8(a)  libhexer::XOUT.Int8(a).c_str()
+#define XINT16(a) libhexer::XOUT.Int16(a).c_str()
+#define XINT24(a) libhexer::XOUT.Int24(a).c_str()
+#define XINT32(a) libhexer::XOUT.Int32(a).c_str()
+#define XINT40(a) libhexer::XOUT.Int40(a).c_str()
+#define XINT48(a) libhexer::XOUT.Int48(a).c_str()
+#define XINT56(a) libhexer::XOUT.Int56(a).c_str()
+#define XINT64(a) libhexer::XOUT.Int64(a).c_str()
+#define XDATN(p,l) libhexer::XOUT.Data(p,l).c_str()
 
 namespace libhexer
 {
 /*
  * HexOut object used by convenience macros.
  */
-//extern HexOut   XOUT;
+extern HexOut   XOUT;
 
 /*
  * HexOut object used by convenience macros.

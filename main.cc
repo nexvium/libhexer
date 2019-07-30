@@ -35,8 +35,13 @@ int main(int, char **)
     printf("%s\n", XINT16(0xaced));
     printf("%s\n", XINT24(0xdecade));
     printf("%s\n", XINT32(0xbabeface));
-    uint8_t buffer[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+    uint8_t buffer[32] = { 0x3f,0x4f,0xb3,0xd9,0x15,0x2a,0xff,0x94,
+                           0x97,0xbb,0xd7,0x3c,0x3c,0x35,0x14,0xac,
+                           0x7c,0x7a,0xc3,0x21,0x9d,0x71,0x05,0x56,
+                           0x47,0xe0,0x42,0x19,0xeb,0x48,0x79,0x22 };
     printf("%s\n", XDATN(buffer, sizeof(buffer)));
+
+    using namespace libhexer;
 
     /* Change default object's settings to format MAC address. */
     XOUT.SetGroupSize(1).SetGroupSeparator(":");
