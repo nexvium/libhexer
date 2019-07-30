@@ -54,14 +54,17 @@ public:
     static const Config CONFIG_DEFAULT;
 
     /*
-     * Create a HexOut object. If the cfg parameter is omitted, default options
-     * are used.
+     * Create a HexOut object. If the cfg parameter is omitted, the default
+     * options are used.
      */
     HexOut(const Config & cfg = CONFIG_DEFAULT)
     {
         SetConfig(cfg);
     }
 
+    /*
+     * Reset object to the default options.
+     */
     void Reset(void)
     {
         SetConfig(CONFIG_DEFAULT);
@@ -82,6 +85,9 @@ public:
         return cfg;
     }
 
+    /*
+     * Set all configuration options at once.
+     */
     void SetConfig(const Config & cfg)
     {
         _xchars             = _GetHexChars(cfg.letter_case);

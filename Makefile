@@ -21,20 +21,20 @@ TARGET := libhexer
 OBJDIR := objs
 DEPDIR := deps
 
-SOURCES := $(wildcard *.cpp)
-OBJECTS := $(patsubst %.cpp,%.o,$(SOURCES))
+SOURCES := $(wildcard *.cc)
+OBJECTS := $(patsubst %.cc,%.o,$(SOURCES))
 
 $(TARGET): $(OBJECTS:%=$(OBJDIR)/%)
 	$(CXX) $(CXXFLAGS) $(OBJECTS:%=$(OBJDIR)/%) -o $(TARGET)
 
-$(DEPDIR)/%.d: %.cpp | $(DEPDIR)
+$(DEPDIR)/%.d: %.cc | $(DEPDIR)
 	@set -e; rm -f $@; \
 	 $(CXX) -MM $(CPPFLAGS) $< > $@.$$$$; \
 	 sed 's,\($*\)\.o[ :]*,$(OBJDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
 	 rm -f $@.$$$$
 
 .SECONDEXPANSION:
-$(OBJECTS:%=$(OBJDIR)/%): $$(patsubst $(OBJDIR)/%.o,%.cpp,$$@) \
+$(OBJECTS:%=$(OBJDIR)/%): $$(patsubst $(OBJDIR)/%.o,%.cc,$$@) \
                           $$(patsubst $(OBJDIR)/%.o,$(DEPDIR)/%.d,$$@) \
                           | $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@

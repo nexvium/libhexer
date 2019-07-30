@@ -16,10 +16,25 @@
 #ifndef LIBHEXER_HEXER_H
 #define LIBHEXER_HEXER_H
 
+#define LIBHEXER_VERSION "0.9.0"
+
 #include "libhexer/hexout.h"
 #include "libhexer/hexin.h"
 
 extern libhexer::HexOut XOUT;
+
+/*
+ * This macros are for convenience when using printf("%s").
+ */
+#define XINT8(a)  XOUT.Int8(a).c_str()
+#define XINT16(a) XOUT.Int16(a).c_str()
+#define XINT24(a) XOUT.Int24(a).c_str()
+#define XINT32(a) XOUT.Int32(a).c_str()
+#define XINT40(a) XOUT.Int40(a).c_str()
+#define XINT48(a) XOUT.Int48(a).c_str()
+#define XINT56(a) XOUT.Int56(a).c_str()
+#define XINT64(a) XOUT.Int64(a).c_str()
+#define XDATN(p,l) XOUT.Data(p,l).c_str()
 
 namespace libhexer
 {

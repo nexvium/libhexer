@@ -18,21 +18,25 @@
 
 #include <assert.h>
 
-using namespace libhexer;
+#include <string>
+
+//using namespace libhexer;
 
 #define CHECKN(a,b,c) do { \
-    string s = b(a); \
+    std::string s = b(a); \
     printf("INPUT: %s  OUTPUT: %s  EXPECTED: %s\n", #a, s.c_str(), c); \
     assert(s == c); \
     } while (0)
 
 int main(int, char **)
 {
-//    /* Test convenience macros. */
-//    printf("%s\n", XINT8(0xbe));
-//    printf("%s\n", XINT16(0xaced));
-//    printf("%s\n", XINT24(0xdecade));
-//    printf("%s\n", XINT32(0xbabeface));
+    /* Test convenience macros. */
+    printf("%s\n", XINT8(0xbe));
+    printf("%s\n", XINT16(0xaced));
+    printf("%s\n", XINT24(0xdecade));
+    printf("%s\n", XINT32(0xbabeface));
+    uint8_t buffer[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+    printf("%s\n", XDATN(buffer, sizeof(buffer)));
 
     /* Change default object's settings to format MAC address. */
     XOUT.SetGroupSize(1).SetGroupSeparator(":");
