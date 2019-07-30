@@ -15,6 +15,8 @@
 */
 #include "libhexer/hexout.h"
 
+#include <assert.h>
+
 using namespace libhexer;
 
 static const char XUPPER[] = { '0', '1', '2', '3', '4', '5', '6', '7',
@@ -63,19 +65,17 @@ const char * HexOut::_GetHexChars(LetterCase lcase) const
     return xchar;
 }
 
-/* This implementation but doesn't do groups.
-string HexOut::_XIntN(int nibbles, uint64_t val) const
+string HexOut::_IntN(size_t len, uint64_t val) const
 {
-    string hex(nibbles, '0');
+    assert(len <= 8);
 
-    for (int i = nibbles - 1; val != 0; i--) {
-        hex[i] = _xchars[val & 0xF];
-        val >>= 4;
+    uint8_t buffer[8];
+    for (size_t i = 1; i <= len; i++) {
+        buffer[i-1] = val >> ((len - i) * 8) & 0xFF;
     }
 
-    return hex;
+    return Data(buffer, len);
 }
-*/
 
 inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
 {
@@ -83,23 +83,24 @@ inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
     return nbytes * 2 + seplen * (ngroups - 1);
 }
 
-string HexOut::_XIntN(size_t nbytes, uint64_t val) const
+string HexOut::Data(void * ptr, size_t len) const
 {
     string hex;
-    hex.reserve(_CalcStrLen(nbytes, _group_size, _group_separator.length()));
+    hex.reserve(_CalcStrLen(len, _group_size, _group_separator.length()));
 
     size_t i = 0;   // group index
     size_t j = 0;   // byte index
+    auto bytes = (uint8_t *)ptr;
 
     if (_partial_group == FRONT) {
-        i = _group_size - (nbytes % _group_size);
+        i = _group_size - (len % _group_size);
     }
-    while (j < nbytes) {
+    while (j < len) {
         if (j > 0 && i % _group_size == 0) {
             hex += _group_separator;
         }
-        hex += _xchars[(val >> ((nbytes - j) * 8 - 4)) & 0xF];
-        hex += _xchars[(val >> ((nbytes - j) * 8 - 8)) & 0xF];
+        hex += _xchars[bytes[j] >> 4 & 0xF];
+        hex += _xchars[bytes[j] >> 0 & 0xF];
         i++, j++;
     }
 

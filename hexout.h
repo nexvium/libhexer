@@ -54,15 +54,17 @@ public:
     static const Config CONFIG_DEFAULT;
 
     /*
-     * Create a HexOut object. If the cfg parameter is null, default options
+     * Create a HexOut object. If the cfg parameter is omitted, default options
      * are used.
      */
     HexOut(const Config & cfg = CONFIG_DEFAULT)
-      : _xchars(_GetHexChars(cfg.letter_case)),
-        _partial_group(_CheckPartialGroup(cfg.partial_group)),
-        _group_size(_CheckGroupSize(cfg.group_size)),
-        _group_separator(cfg.group_separator)
     {
+        SetConfig(cfg);
+    }
+
+    void Reset(void)
+    {
+        SetConfig(CONFIG_DEFAULT);
     }
 
     /*
@@ -78,6 +80,14 @@ public:
         cfg.group_separator = _group_separator;
 
         return cfg;
+    }
+
+    void SetConfig(const Config & cfg)
+    {
+        _xchars             = _GetHexChars(cfg.letter_case);
+        _partial_group      = _CheckPartialGroup(cfg.partial_group);
+        _group_size         = _CheckGroupSize(cfg.group_size);
+        _group_separator    = cfg.group_separator;
     }
 
     /*
@@ -121,11 +131,21 @@ public:
     }
 
     /*
-     * Output ints that are N-bits wide.
+     * Return a hex string of a single N-bit wide integer.
      */
-    string XInt8(uint8_t val)   const { return _XIntN(1, val); }
-    string XInt16(uint16_t val) const { return _XIntN(2, val); }
-    string XInt24(uint32_t val) const { return _XIntN(3, val); }
+    string Int8(uint8_t val)   const { return _IntN(1, val); }
+    string Int16(uint16_t val) const { return _IntN(2, val); }
+    string Int24(uint32_t val) const { return _IntN(3, val); }
+    string Int32(uint32_t val) const { return _IntN(4, val); }
+    string Int40(uint64_t val) const { return _IntN(5, val); }
+    string Int48(uint64_t val) const { return _IntN(6, val); }
+    string Int56(uint64_t val) const { return _IntN(7, val); }
+    string Int64(uint64_t val) const { return _IntN(8, val); }
+
+    /*
+     * Return a hex string of arbitrarily long data.
+     */
+    string Data(void * ptr, size_t len) const;
 
 private:
     const char *    _xchars;
@@ -149,7 +169,7 @@ private:
     }
 
     const char * _GetHexChars(LetterCase lcase) const;
-    string _XIntN(size_t nbytes, uint64_t val) const;
+    string _IntN(size_t len, uint64_t val) const;
 };
 
 } //namespace
