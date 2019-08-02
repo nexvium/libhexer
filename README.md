@@ -60,7 +60,7 @@ to output hex in the format
     // Create custom output object that uses upper-case letters,
     // groups of four bytes, and a single space between groups.
     auto cfg = HexOut::CONFIG_DEFAULT;
-    cfg.letter_case == HexOut::UPPER;
+    cfg.letter_case = HexOut::UPPER;
     cfg.group_size = 4;
     cfg.group_separator = " ";
     auto xout = HexOut(cfg);
