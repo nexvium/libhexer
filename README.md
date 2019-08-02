@@ -67,4 +67,4 @@ to output hex in the format
     
     // Output fixed-sized integers using custom settings.
     std::cout << xout.Int64(a) << std::endl;
-    fprintf(f, "%s", xout.Int364(a).c_str());
+    fprintf(f, "%s", xout.Int64(a).c_str());
