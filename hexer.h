@@ -16,13 +16,14 @@
 #ifndef LIBHEXER_HEXER_H
 #define LIBHEXER_HEXER_H
 
-#define LIBHEXER_VERSION "0.9.0"
+#define LIBHEXER_VERSION "0.9.x"
 
 #include "libhexer/hexout.h"
 #include "libhexer/hexin.h"
 
 /*
- * These macros are for convenience when using printf("%s")-style calls.
+ * These macros are for convenience with printf("%s")-style calls.  They use
+ * a global HexOut object.
  */
 #define XINT8(a)  libhexer::XOUT.Int8(a).c_str()
 #define XINT16(a) libhexer::XOUT.Int16(a).c_str()
@@ -32,20 +33,12 @@
 #define XINT48(a) libhexer::XOUT.Int48(a).c_str()
 #define XINT56(a) libhexer::XOUT.Int56(a).c_str()
 #define XINT64(a) libhexer::XOUT.Int64(a).c_str()
-#define XDATN(p,l) libhexer::XOUT.Data(p,l).c_str()
+#define XBUFN(p,l) libhexer::XOUT.Buffer(p,l).c_str()
 
 namespace libhexer
 {
-/*
- * HexOut object used by convenience macros.
- */
-extern HexOut   XOUT;
-
-/*
- * HexOut object used by convenience macros.
- */
-//extern HexIn    XIN;
-
+    extern HexOut   XOUT;
+    //extern HexIn    XIN;
 } //namespace
 
 #endif //LIBHEXER_HEXER_OUT_H

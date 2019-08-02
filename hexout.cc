@@ -23,7 +23,12 @@ static const char XLOWER[] = { '0', '1', '2', '3', '4', '5', '6', '7',
                                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'  };
 
 namespace libhexer {
-    const HexOut::Config HexOut::CONFIG_DEFAULT;
+    const HexOut::Config HexOut::CONFIG_DEFAULT = {
+            .letter_case = LOWER,
+            .partial_group = LEADING,
+            .group_size = 0,
+            .group_separator = " "
+     };
 
     HexOut XOUT;
 }
@@ -57,7 +62,7 @@ string HexOut::_IntN(size_t len, uint64_t val) const
         buffer[i-1] = val >> ((len - i) * 8) & 0xFF;
     }
 
-    return Data(buffer, len);
+    return Buffer(buffer, len);
 }
 
 inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
@@ -70,14 +75,14 @@ inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
 }
 
 // TODO Break up into grouping and non-grouping versions?
-string HexOut::Data(void * ptr, size_t len) const
+string HexOut::Buffer(void * ptr, size_t len) const
 {
     string hex;
     hex.reserve(_CalcStrLen(len, _group_size, _group_separator.length()));
 
     size_t i = 0, j = 0;
     auto bytes = (uint8_t *)ptr;
-    if (_group_size > 0 && _partial_group == FRONT) {
+    if (_group_size > 0 && _partial_group == LEADING) {
         i = _group_size - (len % _group_size);
     }
     while (j < len) {

@@ -17,10 +17,9 @@
 #include "libhexer/hexer.h"
 
 #include <assert.h>
+#include <string.h>
 
 #include <string>
-
-//using namespace libhexer;
 
 #define CHECKN(a,b,c) do { \
     std::string s = b(a); \
@@ -30,25 +29,36 @@
 
 int main(int, char **)
 {
-    /* Test convenience macros. */
-    printf("%s\n", XINT8(0xbe));
-    printf("%s\n", XINT16(0xaced));
-    printf("%s\n", XINT24(0xdecade));
-    printf("%s\n", XINT32(0xbabeface));
-    uint8_t buffer[32] = { 0x3f,0x4f,0xb3,0xd9,0x15,0x2a,0xff,0x94,
-                           0x97,0xbb,0xd7,0x3c,0x3c,0x35,0x14,0xac,
-                           0x7c,0x7a,0xc3,0x21,0x9d,0x71,0x05,0x56,
-                           0x47,0xe0,0x42,0x19,0xeb,0x48,0x79,0x22 };
-    printf("%s\n", XDATN(buffer, sizeof(buffer)));
+    /* Test macros that use global HexOut object. */
+    assert(strcmp(XINT8(0XBE), "be") == 0);
+    assert(strcmp(XINT16(0xaced), "aced") == 0);
+    assert(strcmp(XINT24(0xdecade), "decade") == 0);
+    assert(strcmp(XINT32(0xBabeFace), "babeface") == 0);
+    uint8_t buffer[32] = { 0X3F,0X4F,0XB3,0XD9,0X15,0X2A,0XFF,0X94,
+                           0X97,0XBB,0XD7,0X3C,0X3C,0X35,0X14,0XAC,
+                           0X7C,0X7A,0XC3,0X21,0X9D,0X71,0X05,0X56,
+                           0X47,0XE0,0X42,0X19,0XEB,0X48,0X79,0X22 };
+    printf("SHA-256: %s\n", XBUFN(buffer, sizeof(buffer)));
+
+    /* Modify the global HexOut object used by macros. */
+    libhexer::XOUT.SetGroupSize(4);
+    printf("SHA-256: %s\n", XBUFN(buffer, sizeof(buffer)));
 
     using namespace libhexer;
 
-    /* Change default object's settings to format MAC address. */
-    XOUT.SetGroupSize(1).SetGroupSeparator(":");
-    CHECKN(0XCAFEBABEFACE, XOUT.Int48, "ca:fe:ba:be:fa:ce");
+    /* Use custom HexOut object. */
+    auto cfg = HexOut::CONFIG_DEFAULT;
+    cfg.group_size = 1;
+    cfg.group_separator = ":";
+    auto xout = HexOut(cfg);
 
-    XOUT.SetGroupSize(2);
-    CHECKN(0xdecade, XOUT.Int24, "de:cade");
+    CHECKN(0XCAFEBABEFACE, xout.Int48, "ca:fe:ba:be:fa:ce");
+
+    xout.SetGroupSize(2);
+    CHECKN(0xdecade, xout.Int24, "de:cade");
+
+    xout.SetPartialGroup(HexOut::TRAILING);
+    CHECKN(0xdecade, xout.Int24, "deca:de");
 
     return 0;
 }

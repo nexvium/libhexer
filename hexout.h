@@ -31,10 +31,10 @@ class HexOut
 public:
     static const size_t MAX_GROUP_SIZE = 1024;
     enum LetterCase { LOWER = 0, UPPER = 1 };
-    enum PartialGroup { FRONT = 0, BACK = 1 };
+    enum PartialGroup { LEADING = 0, TRAILING = 1 };
 
     /*
-     * Configure hex output options. By default, lower case is used and no
+     * Configure hex output options.  By default, lower case is used and no
      * grouping is done.
      */
     struct Config {
@@ -42,32 +42,16 @@ public:
         PartialGroup    partial_group;
         size_t          group_size;
         string          group_separator;
-
-        Config()
-          : letter_case(LOWER),
-            partial_group(FRONT),
-            group_size(0),
-            group_separator("")
-        {
-        }
     };
     static const Config CONFIG_DEFAULT;
 
     /*
-     * Create a HexOut object. If the cfg parameter is omitted, the default
+     * Create a HexOut object.  If the cfg parameter is omitted, the default
      * options are used.
      */
     HexOut(const Config & cfg = CONFIG_DEFAULT)
     {
         SetConfig(cfg);
-    }
-
-    /*
-     * Reset object to the default options.
-     */
-    void Reset(void)
-    {
-        SetConfig(CONFIG_DEFAULT);
     }
 
     /*
@@ -97,8 +81,8 @@ public:
     }
 
     /*
-     * Set letter case to use for hex values A-F. Throws exception on invalid
-     * setting. Returns self to allow chaining.
+     * Set letter case to use for hex digits A-F.  Throws exception on invalid
+     * setting.  Returns self to allow chaining.
      */
     HexOut & SetLetterCase(LetterCase lcase)
     {
@@ -107,8 +91,9 @@ public:
     }
 
     /*
-     * Set partial group mode. Throws exception on invalid setting. Returns
-     * self to allow chaining.
+     * Set partial group mode (whether an incomplete group should be at the
+     * start of the hex string or the end).  Throws exception on invalid
+     * setting.  Returns self to allow chaining.
      */
     HexOut & SetPartialGroup(PartialGroup pg)
     {
@@ -117,8 +102,8 @@ public:
     }
 
     /*
-     * Set group size. Size of 0 means no grouping. Throws exception on invalid
-     * size. Returns self to allow chaining.
+     * Set group size. Size of 0 means no grouping.  Throws exception on invalid
+     * size.  Returns self to allow chaining.
      */
     HexOut & SetGroupSize(size_t size)
     {
@@ -127,7 +112,7 @@ public:
     }
 
     /*
-     * Set group separator, which may be any string. Returns self to allow
+     * Set group separator, which may be any string.  Returns self to allow
      * chaining.
      */
     HexOut & SetGroupSeparator(const string & sep)
@@ -151,7 +136,7 @@ public:
     /*
      * Return a hex string of arbitrarily long data.
      */
-    string Data(void * ptr, size_t len) const;
+    string Buffer(void * ptr, size_t len) const;
 
 private:
     const char *    _xchars;
@@ -159,7 +144,8 @@ private:
     size_t          _group_size;
     string          _group_separator;
 
-    inline size_t _CheckGroupSize(size_t sz) const {
+    inline size_t _CheckGroupSize(size_t sz) const
+    {
         if (sz > MAX_GROUP_SIZE) {
             throw std::runtime_error("group size too big");
         }
@@ -168,7 +154,7 @@ private:
 
     inline PartialGroup _CheckPartialGroup(PartialGroup pg) const
     {
-        if (pg != FRONT && pg != BACK) {
+        if (pg != LEADING && pg != TRAILING) {
             throw std::runtime_error("invalid partial group setting");
         }
         return pg;

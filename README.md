@@ -38,25 +38,33 @@ I decided to implement a more readable, maintainable, and less error-prone
 approach. For example, the first block above can be replaced with
 
     XOUT.GroupSize(4).GroupSeparator(" ");
-    printf("%s: %s\n", XDATN(id, 4), XDATN(data, 64));
+    printf("%s: %s\n", XBUFN(id, 4), XBUFN(data, 64));
+
+to output hex in the format
+
+    xxxxxxxx xxxxxxxx: xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx ...
 
 ## Usage
 
     #include <libhexer/hexer.h>
     
-    using libhexer;
-    
-    // Output fixed-sized integers using defaults.
+    // Output fixed-sized integers using default settings.
     printf("%s", XINT32(a));
     printf("%s", XINT40(b));
 
-    // Output SHA-256 using defaults.
-    printf("%s", XDATN(digest, 32));
+    // Output SHA-256 digest using defaults.
+    printf("%s", XBUFN(digest, 32));
 
-    // Create output custom output object that uses upper-case letters,
+    using namespace libhexer;
+
+    // Create custom output object that uses upper-case letters,
     // groups of four bytes, and a single space between groups.
-    HexOut xout({ .case = UPPER_CASE, .group = 4, .separator = " " });
+    auto cfg = HexOut::CONFIG_DEFAULT;
+    cfg.letter_case == HexOut::UPPER;
+    cfg.group_size = 4;
+    cfg.group_separator = " ";
+    auto xout = HexOut(cfg);
     
     // Output fixed-sized integers using custom settings.
-    std::cout << xout.Int32(a) << std::endl;
-    printf("%s", xout.Int32(a).c_str())
+    std::cout << xout.Int64(a) << std::endl;
+    fprintf(f, "%s", xout.Int364(a).c_str());

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 CPPFLAGS := -DDEBUG -I..
-CXXFLAGS := -ggdb3 -O0 -std=c++0x -pedantic-errors \
+CXXFLAGS := -ggdb3 -O0 -std=c++2a -pedantic-errors \
             -Wall -Wextra -Wshadow -Wparentheses -Wconversion
 TARGET := libhexer
 
