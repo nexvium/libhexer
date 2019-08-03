@@ -30,8 +30,8 @@ class HexOut
 {
 public:
     static const size_t MAX_GROUP_SIZE = 1024;
-    enum LetterCase { LOWER = 0, UPPER = 1 };
-    enum PartialGroup { LEADING = 0, TRAILING = 1 };
+    enum LetterCase { LOWER, UPPER };
+    enum PartialGroup { LEADING, TRAILING };
 
     /*
      * Configure hex output options.  By default, lower case is used and no
@@ -44,6 +44,18 @@ public:
         string          group_separator;
     };
     static const Config CONFIG_DEFAULT;
+
+    /*
+     * Return a new HexOut object.  This allows creating an object and
+     * configuring it at the same time using chaining (for example,
+     *     xout = HexOut::New().SetGroupSize(4);
+     * ).  It *does* invoke the constructor twice, but it is relatively cheap,
+     * so the small cost may be worth the convenience.
+     */
+    static HexOut New(void)
+    {
+        return HexOut();
+    }
 
     /*
      * Create a HexOut object.  If the cfg parameter is omitted, the default
