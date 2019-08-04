@@ -16,7 +16,7 @@
 #ifndef LIBHEXER_HEXER_H
 #define LIBHEXER_HEXER_H
 
-#define LIBHEXER_VERSION "0.9.x"
+#define LIBHEXER_VERSION "0.x.y"
 
 #include "libhexer/hexout.h"
 #include "libhexer/hexin.h"
@@ -39,7 +39,7 @@
 namespace libhexer
 {
     extern HexOut   XOUT;
-    //extern HexIn    XIN;
-} //namespace
+    extern HexIn    XIN;
+}
 
 #endif //LIBHEXER_HEXER_OUT_H

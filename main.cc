@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include <iostream>
 #include <string>
 
 #define CHECKN(a,b,c) do { \
@@ -27,7 +28,9 @@
     assert(s == c); \
     } while (0)
 
-int main(int, char **)
+// TODO: Make all tests actually test results instead of outputting them.
+
+void TestHexOut(void)
 {
     /* Test macros that use global HexOut object. */
     assert(strcmp(XINT8(0XBE), "be") == 0);
@@ -56,6 +59,75 @@ int main(int, char **)
 
     xout.SetPartialGroup(HexOut::TRAILING);
     CHECKN(0xdecade, xout.Int24, "deca:de");
+}
+
+void TestHexIn(void)
+{
+    using namespace std;
+    using namespace libhexer;
+
+    HexIn xin;
+    HexOut xout;
+
+    uint64_t value = 0;
+    const char *rest = xin.Parse("DEADBEEFCAFEBABE", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    value = 0;
+    rest = xin.Parse("DEADBEEF CAFEBABE", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    value = 0;
+    xin.Ignore(" ");
+    rest = xin.Parse("DEADBEEF CAFEBABE", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    value = 0;
+    rest = xin.Parse("Dead Beef\tCafe Babe", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    value = 0;
+    xin.Ignore(" \t");
+    rest = xin.Parse("Dead Beef\tCafe Babe", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    value = 0;
+    xin.Ignore(":");
+    rest = xin.Parse("00:1e:8c:0e:7d:e6 <-- HWaddr", (uint8_t *)&value, 8);
+    cout << hex << value << " + \"" << rest << "\"" << endl;
+
+    uint8_t *data = NULL;
+    size_t   count = 0;
+    xin.Ignore(": ");
+    rest = xin.Parse("020C0600 00000005 : 000029FF F5C618D1 C1B7ED48 395925C2"
+                     "E76D65ED 4AC39588 AA1AD11F F99F1178 A0ADFA44 950154F5"
+                     "DD504AC1 DD36933C DC95E371 14DC3251 EEEF1ECC 81BB6495"
+                     "8F91DA0D 27F888AB 8F2D2614 6FCB9378 05003DB0",
+                     &data, &count);
+
+    cout << xout.ToString(data, count) << endl;
+
+    xout.SetGroupSize(8).SetLetterCase(HexOut::UPPER);
+    cout << xout.ToString(data, count) << endl;
+
+    delete data;
+    data = NULL;
+
+    xin.Ignore(NULL);
+    xin.Ignore("");
+    cout << hex << xin.UInt16("1fe") << endl;
+
+    cout << hex << xin.UInt64("4AC39588AA1AD11F") << endl;
+}
+
+int main(int, char **)
+{
+    std::cout << "HEX OUT:" << std::endl;
+    TestHexOut();
+    std::cout << std::endl;
+
+    std::cout << "HEX IN:" << std::endl;
+    TestHexIn();
 
     return 0;
 }

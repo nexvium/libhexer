@@ -15,25 +15,158 @@
 */
 #include "libhexer/hexin.h"
 
-#include <assert.h>
+#include <string.h>
+
+namespace libhexer {
+    HexIn XIN;
+}
 
 using namespace libhexer;
 
-static const char XTABLE[256] = {
-    /* 00-0F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 10-1F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 20-2F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 30-3F */  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
-    /* 40-4F */ -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 50-5F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 60-6F */ -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 70-7F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 80-8F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* 90-9F */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* A0-AF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* B0-BF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* C0-CF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* D0-DF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* E0-EF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    /* F0-FF */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-};
+const size_t NUM_CHARS = 256;
+
+const int8_t CHAR_INVALID = -1;
+const int8_t CHAR_IGNORE  = 16;
+
+// Set all characters in map to invalid.
+void SetInvalidChars(char map[NUM_CHARS])
+{
+    memset(map, CHAR_INVALID, NUM_CHARS);
+}
+
+// Set hex characters to their value.
+void SetHexChars(char map[NUM_CHARS])
+{
+    int i;
+
+    for (i = '0'; i <= '9'; i++)
+        map[i] = char(i - '0');
+
+    for (i = 'A'; i <= 'F'; i++) {
+        map[i] = char(i - 'A' + 10);
+        map[i | (1 << 5)] = map[i];
+    }
+}
+
+HexIn::HexIn(const char *str, uint8_t *buf, size_t n)
+{
+    Ignore(NULL);
+    const char *end = Parse(str, buf, n);
+    if (*end != 0) {
+        if (_chr[(uint8_t)*end] == CHAR_INVALID)
+            throw std::runtime_error("invalid hex character");
+        else
+            throw std::runtime_error("buffer too small");
+    }
+}
+
+void HexIn::Ignore(const char *chars)
+{
+    SetInvalidChars(_chr);
+    if (chars != NULL) {
+        while (*chars != 0)
+            _chr[(int)*chars++] = CHAR_IGNORE;
+    }
+    SetHexChars(_chr);
+}
+
+char *HexIn::Parse(const char *str, uint8_t *buf, size_t n) const
+{
+    size_t j = 0;
+
+    if (str == NULL)
+        return NULL;
+
+    size_t i;
+    for (i = 0; str[i] != 0 && j / 2 < n; i++) {
+        uint8_t c = str[i];
+
+        if (_chr[c] == CHAR_INVALID)
+            break;
+        else if (_chr[c] == CHAR_IGNORE)
+            continue;
+        else if (j % 2 == 0)
+            buf[j / 2]  = uint8_t(_chr[c] << 4);
+        else
+            buf[j / 2] |= uint8_t(_chr[c]);
+
+        j++;
+    }
+
+    return (char *)str + i;
+}
+
+char *HexIn::Parse(const char *str, uint8_t **buf, size_t *n) const
+{
+    if (str == NULL)
+        return NULL;
+
+    // find the number of hex chars as well as their end
+    const char *pos = str;
+    size_t xdigits = 0;
+    while (*pos != 0) {
+        uint8_t c = *pos++;
+
+        if (_chr[c] == CHAR_INVALID)
+            break;
+        else if (_chr[c] == CHAR_IGNORE)
+            continue;
+        else
+            xdigits++;
+    }
+
+    if (buf == NULL && n == NULL)
+        return (char *)pos;
+
+    size_t size = xdigits / 2 + xdigits % 2;
+    if (n != NULL)
+        *n = size;
+
+    if (buf == NULL)
+        return (char *)pos;
+
+    // use "operator new(size)" instead of "new uint8_t[size]" so that the
+    // memory can be released with "delete" rather than requiring "delete[]".
+    *buf = static_cast<uint8_t *>(operator new (size));
+
+    return Parse(str, *buf, size);
+}
+
+uint8_t HexIn::UInt8(const char *str) const
+{
+    uint8_t byte;
+    char *end = Parse(str, &byte, 1);
+    if (*end != 0)
+        throw std::runtime_error("string is not 8-bit value");
+    return byte;
+}
+
+uint16_t HexIn::UInt16(const char *str) const
+{
+    uint8_t bytes[2];
+    char *end = Parse(str, (uint8_t *)&bytes, 2);
+    if (*end != 0)
+        throw std::runtime_error("string is not 16-bit value");
+    return uint16_t(bytes[1] << 8 | bytes[0]);
+}
+
+uint32_t HexIn::UInt32(const char *str) const
+{
+    uint8_t bytes[4];
+    char *end = Parse(str, (uint8_t *)&bytes, 4);
+    if (*end != 0)
+        throw std::runtime_error("string is not 32-bit value");
+    return bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
+}
+
+uint64_t HexIn::UInt64(const char *str) const
+{
+    uint8_t bytes[8];
+    char *end = Parse(str, (uint8_t *)&bytes, 8);
+    if (*end != 0)
+        throw std::runtime_error("string is not 64-bit value");
+    return (uint64_t)bytes[0] << 56 | (uint64_t)bytes[1] << 48 |
+           (uint64_t)bytes[2] << 40 | (uint64_t)bytes[3] << 32 |
+           (uint64_t)bytes[4] << 24 | (uint64_t)bytes[5] << 16 |
+           (uint64_t)bytes[6] <<  8 | (uint64_t)bytes[7];
+}
