@@ -27,7 +27,7 @@ namespace libhexer {
             .letter_case = LOWER,
             .partial_group = LEADING,
             .group_size = 0,
-            .group_separator = " "
+            .group_separator = ' '
      };
 
     HexOut XOUT;
@@ -65,20 +65,19 @@ string HexOut::_IntN(size_t len, uint64_t val) const
     return Buffer(buffer, len);
 }
 
-inline size_t _CalcStrLen(size_t nbytes, size_t grpsz, size_t seplen)
+inline size_t _CalcStrLen(size_t nbytes, size_t grpsz)
 {
     size_t ngroups = 1;
     if (grpsz > 0) {
         ngroups = nbytes / grpsz + (nbytes % grpsz ? 1 : 0);
     }
-    return nbytes * 2 + seplen * (ngroups - 1);
+    return nbytes * 2 + (ngroups - 1);
 }
 
-// TODO Break up into grouping and non-grouping versions?
 string HexOut::Buffer(void * ptr, size_t len) const
 {
     string hex;
-    hex.reserve(_CalcStrLen(len, _group_size, _group_separator.length()));
+    hex.reserve(_CalcStrLen(len, _group_size));
 
     size_t i = 0, j = 0;
     auto bytes = (uint8_t *)ptr;

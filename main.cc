@@ -47,7 +47,7 @@ int main(int, char **)
     using namespace libhexer;
 
     /* Use custom HexOut object. */
-    auto xout = HexOut::New().SetGroupSize(1).SetGroupSeparator(":");
+    auto xout = HexOut::New().SetGroupSize(1).SetGroupSeparator(':');
 
     CHECKN(0XCAFEBABEFACE, xout.Int48, "ca:fe:ba:be:fa:ce");
 

@@ -41,7 +41,7 @@ public:
         LetterCase      letter_case;
         PartialGroup    partial_group;
         size_t          group_size;
-        string          group_separator;
+        char            group_separator;
     };
     static const Config CONFIG_DEFAULT;
 
@@ -124,12 +124,12 @@ public:
     }
 
     /*
-     * Set group separator, which may be any string.  Returns self to allow
-     * chaining.
+     * Set group separator, which may be any non-zero character. Throws
+     * exception on invalid character.
      */
-    HexOut & SetGroupSeparator(const string & sep)
+    HexOut & SetGroupSeparator(char sep)
     {
-        _group_separator = sep;
+        _group_separator = _CheckGroupSeparator(sep);
         return *this;
     }
 
@@ -154,7 +154,15 @@ private:
     const char *    _xchars;
     PartialGroup    _partial_group;
     size_t          _group_size;
-    string          _group_separator;
+    char            _group_separator;
+
+    inline PartialGroup _CheckPartialGroup(PartialGroup pg) const
+    {
+        if (pg != LEADING && pg != TRAILING) {
+            throw std::runtime_error("invalid partial group setting");
+        }
+        return pg;
+    }
 
     inline size_t _CheckGroupSize(size_t sz) const
     {
@@ -164,12 +172,12 @@ private:
         return sz;
     }
 
-    inline PartialGroup _CheckPartialGroup(PartialGroup pg) const
+    inline char _CheckGroupSeparator(char sep) const
     {
-        if (pg != LEADING && pg != TRAILING) {
-            throw std::runtime_error("invalid partial group setting");
+        if (sep < 1) {
+            throw std::runtime_error("invalid group separator");
         }
-        return pg;
+        return sep;
     }
 
     const char * _GetHexChars(LetterCase lcase) const;

@@ -9,7 +9,9 @@ This library was motivated by working on an existing code base that made
 extensive use of hexadecimal to exchange binary data between programs.  I was
 dismayed to see the source littered with code fragments like
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 8; i++) {
+        if (i == 4)
+            printf(" ");
         printf("%02X", id[i]);
     }
     printf(":");
@@ -37,8 +39,8 @@ output.
 I decided to implement a more readable, maintainable, and less error-prone
 approach. For example, the first block above can be replaced with
 
-    XOUT.GroupSize(4).GroupSeparator(" ");
-    printf("%s: %s\n", XBUFN(id, 4), XBUFN(data, 64));
+    XOUT.GroupSize(4).GroupSeparator(' ');
+    printf("%s: %s\n", XBUFN(id, 8), XBUFN(data, 64));
 
 to output hex in the format
 
@@ -61,7 +63,7 @@ to output hex in the format
     // groups of four bytes, and a single space between groups.
     auto xout = HexOut::New().SetLetterCase(HexOut::UPPER)
                              .SetGroupSize(4)
-                             .SetGroupSeparator(" ");
+                             .SetGroupSeparator(' ');
     
     // Output fixed-sized integers using custom settings.
     std::cout << xout.Int64(a) << std::endl;
