@@ -148,7 +148,13 @@ public:
     /*
      * Return a hex string of arbitrarily long data.
      */
-    string Buffer(void * ptr, size_t len) const;
+    string ToString(void * dat, size_t len) const;
+
+    /*
+     * Write the hex string into the user-provided buffer.  An exception is
+     * thrown if the buffer is not big enough.  Returns buf.
+     */
+    char *ToCString(void * dat, size_t len, char *buf, size_t buflen) const;
 
 private:
     const char *    _xchars;

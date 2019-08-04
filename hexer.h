@@ -33,7 +33,8 @@
 #define XINT48(a) libhexer::XOUT.Int48(a).c_str()
 #define XINT56(a) libhexer::XOUT.Int56(a).c_str()
 #define XINT64(a) libhexer::XOUT.Int64(a).c_str()
-#define XBUFN(p,l) libhexer::XOUT.Buffer(p,l).c_str()
+#define XTOSTR(d,l) libhexer::XOUT.ToString(d,l).c_str()
+#define XTOCSTR(d,dl,b,bl) libhexer::XOUT.ToCString(d,dl,b,bl)
 
 namespace libhexer
 {

@@ -38,11 +38,11 @@ int main(int, char **)
                            0X97,0XBB,0XD7,0X3C,0X3C,0X35,0X14,0XAC,
                            0X7C,0X7A,0XC3,0X21,0X9D,0X71,0X05,0X56,
                            0X47,0XE0,0X42,0X19,0XEB,0X48,0X79,0X22 };
-    printf("SHA-256: %s\n", XBUFN(buffer, sizeof(buffer)));
+    printf("SHA-256: %s\n", XTOSTR(buffer, sizeof(buffer)));
 
     /* Modify the global HexOut object used by macros. */
     libhexer::XOUT.SetGroupSize(4);
-    printf("SHA-256: %s\n", XBUFN(buffer, sizeof(buffer)));
+    printf("SHA-256: %s\n", XTOSTR(buffer, sizeof(buffer)));
 
     using namespace libhexer;
 

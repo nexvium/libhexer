@@ -40,7 +40,7 @@ I decided to implement a more readable, maintainable, and less error-prone
 approach. For example, the first block above can be replaced with
 
     XOUT.GroupSize(4).GroupSeparator(' ');
-    printf("%s: %s\n", XBUFN(id, 8), XBUFN(data, 64));
+    printf("%s: %s\n", XTOSTR(id, 8), XTOSTR(data, 64));
 
 to output hex in the format
 
@@ -55,7 +55,7 @@ to output hex in the format
     printf("%s", XINT40(b));
 
     // Output SHA-256 digest using defaults.
-    printf("%s", XBUFN(digest, 32));
+    printf("%s", XTOSTR(digest, 32));
 
     using namespace libhexer;
 

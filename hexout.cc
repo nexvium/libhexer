@@ -62,7 +62,7 @@ string HexOut::_IntN(size_t len, uint64_t val) const
         buffer[i-1] = val >> ((len - i) * 8) & 0xFF;
     }
 
-    return Buffer(buffer, len);
+    return ToString(buffer, len);
 }
 
 inline size_t _CalcStrLen(size_t nbytes, size_t grpsz)
@@ -74,24 +74,38 @@ inline size_t _CalcStrLen(size_t nbytes, size_t grpsz)
     return nbytes * 2 + (ngroups - 1);
 }
 
-string HexOut::Buffer(void * ptr, size_t len) const
+string HexOut::ToString(void * dat, size_t len) const
 {
-    string hex;
-    hex.reserve(_CalcStrLen(len, _group_size));
+    string str;
+
+    str.resize(_CalcStrLen(len, _group_size));
+    ToCString(dat, len, str.data(), str.size() + 1);
+
+    return str;
+}
+
+char* HexOut::ToCString(void * dat, size_t len, char * buf, size_t buflen) const
+{
+    if (buflen < _CalcStrLen(len, _group_size) + 1) {
+        throw std::runtime_error("buffer too small");
+    }
 
     size_t i = 0, j = 0;
-    auto bytes = (uint8_t *)ptr;
+    auto bytes = (uint8_t *)dat;
     if (_group_size > 0 && _partial_group == LEADING) {
         i = _group_size - (len % _group_size);
     }
+
+    char * str = buf;
     while (j < len) {
         if (_group_size > 0 && j > 0 && i % _group_size == 0) {
-            hex += _group_separator;
+            *str++ =_group_separator;
         }
-        hex += _xchars[bytes[j] >> 4 & 0xF];
-        hex += _xchars[bytes[j] >> 0 & 0xF];
+        *str++ = _xchars[bytes[j] >> 4 & 0xF];
+        *str++ = _xchars[bytes[j] >> 0 & 0xF];
         i++, j++;
     }
+    *str = 0;
 
-    return hex;
+    return buf;
 }
