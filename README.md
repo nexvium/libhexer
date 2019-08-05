@@ -51,8 +51,8 @@ to output hex in the format
     #include <libhexer/hexer.h>
     
     // Output fixed-sized integers using default settings.
-    printf("%s", XINT32(a));
-    printf("%s", XINT40(b));
+    printf("%s", XUINT32(a));
+    printf("%s", XUINT40(b));
 
     // Output SHA-256 digest using defaults.
     printf("%s", XTOSTR(digest, 32));
@@ -66,5 +66,5 @@ to output hex in the format
                              .SetGroupSeparator(' ');
     
     // Output fixed-sized integers using custom settings.
-    std::cout << xout.Int64(a) << std::endl;
-    fprintf(f, "%s", xout.Int64(a).c_str());
+    std::cout << xout.UInt64(a) << std::endl;
+    fprintf(f, "%s", xout.UInt64(a).c_str());

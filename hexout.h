@@ -136,14 +136,14 @@ public:
     /*
      * Return a hex string of a single N-bit wide integer.
      */
-    string Int8(uint8_t val)   const { return _IntN(1, val); }
-    string Int16(uint16_t val) const { return _IntN(2, val); }
-    string Int24(uint32_t val) const { return _IntN(3, val); }
-    string Int32(uint32_t val) const { return _IntN(4, val); }
-    string Int40(uint64_t val) const { return _IntN(5, val); }
-    string Int48(uint64_t val) const { return _IntN(6, val); }
-    string Int56(uint64_t val) const { return _IntN(7, val); }
-    string Int64(uint64_t val) const { return _IntN(8, val); }
+    string UInt8(uint8_t val)   const { return _UIntN(1, val); }
+    string UInt16(uint16_t val) const { return _UIntN(2, val); }
+    string UInt24(uint32_t val) const { return _UIntN(3, val); }
+    string UInt32(uint32_t val) const { return _UIntN(4, val); }
+    string UInt40(uint64_t val) const { return _UIntN(5, val); }
+    string UInt48(uint64_t val) const { return _UIntN(6, val); }
+    string UInt56(uint64_t val) const { return _UIntN(7, val); }
+    string UInt64(uint64_t val) const { return _UIntN(8, val); }
 
     /*
      * Return a hex string of arbitrarily long data.
@@ -187,7 +187,7 @@ private:
     }
 
     const char * _GetHexChars(LetterCase lcase) const;
-    string _IntN(size_t len, uint64_t val) const;
+    string _UIntN(size_t len, uint64_t val) const;
 };
 
 } //namespace

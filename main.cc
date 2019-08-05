@@ -33,10 +33,10 @@
 void TestHexOut(void)
 {
     /* Test macros that use global HexOut object. */
-    assert(strcmp(XINT8(0XBE), "be") == 0);
-    assert(strcmp(XINT16(0xaced), "aced") == 0);
-    assert(strcmp(XINT24(0xdecade), "decade") == 0);
-    assert(strcmp(XINT32(0xBabeFace), "babeface") == 0);
+    assert(strcmp(XUINT8(0XBE), "be") == 0);
+    assert(strcmp(XUINT16(0xaced), "aced") == 0);
+    assert(strcmp(XUINT24(0xdecade), "decade") == 0);
+    assert(strcmp(XUINT32(0xBabeFace), "babeface") == 0);
     uint8_t buffer[32] = { 0X3F,0X4F,0XB3,0XD9,0X15,0X2A,0XFF,0X94,
                            0X97,0XBB,0XD7,0X3C,0X3C,0X35,0X14,0XAC,
                            0X7C,0X7A,0XC3,0X21,0X9D,0X71,0X05,0X56,
@@ -52,13 +52,13 @@ void TestHexOut(void)
     /* Use custom HexOut object. */
     auto xout = HexOut::New().SetGroupSize(1).SetGroupSeparator(':');
 
-    CHECKN(0XCAFEBABEFACE, xout.Int48, "ca:fe:ba:be:fa:ce");
+    CHECKN(0XCAFEBABEFACE, xout.UInt48, "ca:fe:ba:be:fa:ce");
 
     xout.SetGroupSize(2);
-    CHECKN(0xdecade, xout.Int24, "de:cade");
+    CHECKN(0xdecade, xout.UInt24, "de:cade");
 
     xout.SetPartialGroup(HexOut::TRAILING);
-    CHECKN(0xdecade, xout.Int24, "deca:de");
+    CHECKN(0xdecade, xout.UInt24, "deca:de");
 }
 
 void TestHexIn(void)

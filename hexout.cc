@@ -53,7 +53,7 @@ const char * HexOut::_GetHexChars(LetterCase lcase) const
     return xchar;
 }
 
-string HexOut::_IntN(size_t len, uint64_t val) const
+string HexOut::_UIntN(size_t len, uint64_t val) const
 {
     assert(len <= 8);
 
